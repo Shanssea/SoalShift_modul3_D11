@@ -349,40 +349,21 @@ Pada Client dibuat 2 connection dengan 2 socket. 1 ke Server Pembeli dan 1 ke Se
         
     -  Kedua karakter memiliki status yang unik
         
-        -   Agmal mempunyai WakeUp_Status, di awal program memiliki status 0
-            
+        -   Agmal mempunyai WakeUp_Status, di awal program memiliki status 
         -   Iraj memiliki Spirit_Status,  di awal program memiliki status 100
             
-      -   Terdapat 3 Fitur utama
-            
-
-			-   All Status, yaitu menampilkan status kedua sahabat
-    Ex: Agmal WakeUp_Status = 75
-Iraj Spirit_Status = 30
-
-			-   “Agmal Ayo Bangun” menambah WakeUp_Status Agmal sebesar 15 point
-    
-			-   “Iraj Ayo Tidur” mengurangi Spirit_Status Iraj sebanyak 20 point
-    
-
-		-   Terdapat Kasus yang unik dimana:
-    
-		    -   Jika Fitur “Agmal Ayo Bangun” dijalankan sebanyak 3 kali, maka Fitur “Iraj Ayo Tidur” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Fitur Iraj Ayo Tidur disabled 10 s”)
-        
-		    -   Jika Fitur “Iraj Ayo Tidur” dijalankan sebanyak 3 kali, maka Fitur “Agmal Ayo Bangun” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Agmal Ayo Bangun disabled 10 s”)
-        
-		-   Program akan berhenti jika Salah Satu :
-    
-		    -   WakeUp_Status Agmal >= 100 (Tampilkan Pesan “Agmal Terbangun,mereka bangun pagi dan berolahraga”)
-        
-		    -   Spirit_Status Iraj <= 0 (Tampilkan Pesan “Iraj ikut tidur, dan bangun kesiangan bersama Agmal”)
-        
-
-  
-
-  
-
-	-   **Syarat Menggunakan Lebih dari 1 Thread**
+    -   Terdapat 3 Fitur utama
+        -   All Status, yaitu menampilkan status kedua sahabatEx: Agmal WakeUp_Status = 75Iraj Spirit_Status = 30
+        -   “Agmal Ayo Bangun” menambah WakeUp_Status Agmal sebesar 15 point
+        -   “Iraj Ayo Tidur” mengurangi Spirit_Status Iraj sebanyak 20 point
+	
+    -   Terdapat Kasus yang unik dimana:
+    	-   Jika Fitur “Agmal Ayo Bangun” dijalankan sebanyak 3 kali, maka Fitur “Iraj Ayo Tidur” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Fitur Iraj Ayo Tidur disabled 10 s”)
+        -   Jika Fitur “Iraj Ayo Tidur” dijalankan sebanyak 3 kali, maka Fitur “Agmal Ayo Bangun” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Agmal Ayo Bangun disabled 10 s”)
+    -   Program akan berhenti jika Salah Satu :
+    	-   WakeUp_Status Agmal >= 100 (Tampilkan Pesan “Agmal Terbangun,mereka bangun pagi dan berolahraga”)              
+        -   Spirit_Status Iraj <= 0 (Tampilkan Pesan “Iraj ikut tidur, dan bangun kesiangan bersama Agmal”
+    -   **Syarat Menggunakan Lebih dari 1 Thread**
 ```c
 #include<stdio.h>
 #include<string.h>
@@ -450,10 +431,12 @@ void *func (void *fitur)
 			WakeUp_Status+=15;
 				counta++;		
 		}
+		if (WakeUp_Status >= 100){
+			printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
+			exit(0);}
 	}
 	else if(pthread_equal(id,th[2]))
-	{
-		
+	{	
 		if (counti == 3){
 			printf("Agmal Ayo Bangun disabled 10 s\n");
 			A=1;
@@ -471,6 +454,9 @@ void *func (void *fitur)
 			Spirit_Status-=20;
 			counti++;
 		}
+		if (Spirit_Status <= 0){
+			printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
+			exit(0);}
 		I = 0;
 	}
 	return NULL;
@@ -480,14 +466,6 @@ void *func (void *fitur)
 
 int main(){
 	while (1){
-		if (WakeUp_Status >= 100){
-			printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
-			break;
-		}
-		else if (Spirit_Status <= 0){
-			printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
-			break;
-		}
 		char inf[255];
 		fgets(inf,255,stdin);
 		int t;
@@ -496,19 +474,15 @@ int main(){
 		if (strcmp(inf,"All Status")==0)
 		{
 			t=pthread_create(&(th[0]),NULL,func,(void*)inf);
-			//t=pthread_join(th[0],NULL);
 		}
 		else if (strcmp(inf,"Agmal Ayo Bangun")==0)
 		{
-			t=pthread_create(&(th[1]),NULL,func,(void*)inf);
-			//t=pthread_join(th[1],NULL);
+			t=pthread_create(&(th[1]),NULL,func,(void*)inf);	
 		}
 	
 		else if (strcmp(inf,"Iraj Ayo Tidur")==0)
 		{
 			t=pthread_create(&(th[2]),NULL,func,(void*)inf);
-			//t=pthread_join(th[2],NULL);	
-		
 		}
 
 	}
@@ -542,7 +516,82 @@ Fungsi setTimeout berfungsi sebagai timer di program ini.
     
 -   Boleh menggunakan system
 
-*belum mengerjakan*
+```c
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+#include<unistd.h>
+
+//pertama buat thread dulu, buatnya 2 cukup untuk 2 thread
+pthread_t tid[1];
+
+//yang ini fungsi untuk buat directory, make system mkdir
+void *makedir1(void *argv){
+    system("mkdir -p /home/sea/Documents/Sisop/Modul_3/FolderProses1");
+}
+//ini juga sama, mkdir untuk folder proses 2
+void *makedir2(void *argv){
+    system("mkdir -p /home/sea/Documents/Sisop/Modul_3/FolderProses2");
+}
+//ini fungsi untuk mencatat list proses (ps -aux) maksimal 10 (head -n 11)--> untuk ngambil 11 baris dari ps -aux (termasuk headernya), (tail -n 10)--> untuk mengambil 10 baris terakhir. jadi headernya tidak tercatat di file nantinya. 
+void *write1(void *argv){
+    system("ps -aux | head -n 11 | tail -n 10 > /home/sea/Documents/Sisop/Modul_3/FolderProses1/SimpanProses1.txt");
+}
+//sama kayak yang atas
+void *write2(void *argv){
+    system("ps -aux | head -n 11 | tail -n 10 > /home/sea/Documents/Sisop/Modul_3/FolderProses2/SimpanProses2.txt");
+}
+//fungsi kompres, pertama masuk ke foldernya dulu (cd). lalu di kompres dengan menggunakan zip -q. -q berfungsi agar tidak tercetak info kompress seperti yang tertera di lampiran
+void *compress1(void *argv){
+    system("cd /home/sea/Documents/Sisop/Modul_3/FolderProses1/ && zip -q KompresProses1.zip SimpanProses1.txt && rm SimpanProses1.txt");
+}
+//sama seperti yang atas
+void *compress2(void *argv){
+    system("cd /home/sea/Documents/Sisop/Modul_3/FolderProses2/ && zip -q KompresProses2.zip SimpanProses2.txt && rm SimpanProses2.txt");
+}
+//fungsi extract. pertama masuk ke foldernya dahulu, lalu extract filenya menggunakan unzip -q. -q berfungsi agar tidak tercetak info kompress seperti yang tertera di lampiran
+void *extract1(void *argv){
+    system("cd /home/sea/Documents/Sisop/Modul_3/FolderProses1/ && unzip -q KompresProses1.zip");
+}
+// sama seperti yang atas
+void *extract2(void *argv){
+    system("cd /home/sea/Documents/Sisop/Modul_3/FolderProses2/ && unzip -q KompresProses2.zip");
+}
+
+
+
+int main(){
+	//membuat thread untuk fungsi makedir1 dan makedir2 agar berjalan bersama-sama, maka di joinkan setelah kedua thread telah selesai dibuat.
+	pthread_create(&tid[0], NULL, &makedir1, NULL);
+	pthread_create(&tid[1], NULL, &makedir2, NULL);
+	pthread_join(tid[0],NULL);
+	pthread_join(tid[0],NULL);
+	
+	//membuat thread dengan fungsi write1 dan write2
+	pthread_create(&tid[0], NULL, &write1, NULL);
+	pthread_create(&tid[1], NULL, &write2, NULL);
+	pthread_join(tid[0],NULL);
+	pthread_join(tid[1],NULL);
+
+	//membuat thread dengan fungsi compress1 dan compress2
+	pthread_create(&tid[0], NULL, &compress1, NULL);
+	pthread_create(&tid[1], NULL, &compress2, NULL);
+	pthread_join(tid[0],NULL);
+	pthread_join(tid[1],NULL);
+
+	//mencetak "Menunggu 15 detik untuk mengekstrak kembali", lalu menggunakan sleep untuk menghentikan program selama 15 detik
+	printf("Menunggu 15 detik untuk mengekstrak kembali\n");
+    	sleep(15);	
+
+	//membuat thread untuk menjalankan fungsi extract1 dan extract2
+	pthread_create(&tid[0], NULL, &extract1, NULL);
+	pthread_create(&tid[1], NULL, &extract2, NULL);
+	pthread_join(tid[0],NULL);
+	pthread_join(tid[1],NULL);
+
+}
+```
+Buat fungsi makedir1 dan makedir2 untuk membuat folder, lalu fungsi write1 dan write2 untuk menyimpan list proses ke file. Fungsi compress1 dan compress2 untuk mengkompress file, lalu fungsi extract1 dan extract2 untuk mengextract file. Lalu dibuat threadnya satu persatu lalu dijoinkan(diterminate) sesuai dengan soal.
   
 ## Soal 5
 
