@@ -64,10 +64,12 @@ void *func (void *fitur)
 			WakeUp_Status+=15;
 				counta++;		
 		}
+		if (WakeUp_Status >= 100){
+			printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
+			exit(0);}
 	}
 	else if(pthread_equal(id,th[2]))
-	{
-		
+	{	
 		if (counti == 3){
 			printf("Agmal Ayo Bangun disabled 10 s\n");
 			A=1;
@@ -85,6 +87,9 @@ void *func (void *fitur)
 			Spirit_Status-=20;
 			counti++;
 		}
+		if (Spirit_Status <= 0){
+			printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
+			exit(0);}
 		I = 0;
 	}
 	return NULL;
@@ -94,14 +99,6 @@ void *func (void *fitur)
 
 int main(){
 	while (1){
-		if (WakeUp_Status >= 100){
-			printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
-			break;
-		}
-		else if (Spirit_Status <= 0){
-			printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
-			break;
-		}
 		char inf[255];
 		fgets(inf,255,stdin);
 		int t;
@@ -110,19 +107,15 @@ int main(){
 		if (strcmp(inf,"All Status")==0)
 		{
 			t=pthread_create(&(th[0]),NULL,func,(void*)inf);
-			//t=pthread_join(th[0],NULL);
 		}
 		else if (strcmp(inf,"Agmal Ayo Bangun")==0)
 		{
-			t=pthread_create(&(th[1]),NULL,func,(void*)inf);
-			//t=pthread_join(th[1],NULL);
+			t=pthread_create(&(th[1]),NULL,func,(void*)inf);	
 		}
 	
 		else if (strcmp(inf,"Iraj Ayo Tidur")==0)
 		{
 			t=pthread_create(&(th[2]),NULL,func,(void*)inf);
-			//t=pthread_join(th[2],NULL);	
-		
 		}
 
 	}

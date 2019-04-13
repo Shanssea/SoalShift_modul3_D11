@@ -14,17 +14,12 @@ int *stock;
 int status = 0;
 
 void *beli (){
-	//int m = *((int *)msg);
-	//while(valread =  read( m , buffer, 1024)){
-		if (status == 0)(*stock) --;
-	//}
-}
-void *cekstock (){
-	if (*stock <= 0){
-		printf("transaksi gagal\n");
-		status = 1;
-	}
-	else printf("transaksi berhasil\n");
+		if (*stock > 0){
+			(*stock) --;
+			printf("transaksi berhasil\n");
+		}else{
+			printf("transaksi gagal\n");
+		}
 }
 
 
@@ -34,7 +29,6 @@ int main(int argc, char const *argv[]) {
     int opt = 1; 
     int status = 0;
     int addrlen = sizeof(address);
-    //char buffer[1024] = {0};
     pthread_t t,y;
     
 
@@ -76,15 +70,10 @@ int main(int argc, char const *argv[]) {
     while(1){
 	    	char buffer[1024] = {0};
 	    	valread = read( new_socket , buffer, 1024);
-		//printf("status 1 = %d\n",status);
 		if (strcmp(buffer,"beli")==0){
-			pthread_create(&t,NULL,cekstock,NULL);
 			pthread_create(&y,NULL,beli,NULL);
 			pthread_join(y,NULL);			
-			status = 0;
 		}
-		//printf("%s = %d\n",buffer,*stock);
-		
     }
     return 0;
 }

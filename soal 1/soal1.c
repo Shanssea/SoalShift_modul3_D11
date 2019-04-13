@@ -14,14 +14,13 @@ void *fact(void *arguments){
 			printf("%d! = %lld\n",num,fact);
 }
 
-int main (void){
+int main (int argc, char* argv[]){
 	int arr[225];
 	char c;
 	int a;
-	for (int i=0; c!='\n'; i++)
-	{
-		scanf("%d%c",&arr[i],&c);
-		count++;
+	while (argv[i] != NULL){
+		arr[i]=atoi(argv[i]);
+		i++;
 	}
 
 	for (int i=0; i < count; i++)
